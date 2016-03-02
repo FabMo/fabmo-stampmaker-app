@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="en"> 
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8"/>
+<link rel="stylesheet" href="css/jquery.mobile-1.4.5.css">
+
+
+<script src="js/jquery-1.11.2.min.js"></script>
+<script src="js/libs/fabmo.js"></script>
+    <script type="text/javascript">
+        var fabmo = new FabMoDashboard();
+    </script>
+<script src="js/control.js"></script>
+<script src="js/config.js"></script>
+<script src="js/jquery.mobile-1.4.5.js"></script>
+<script src="js/processing.min.js"></script>
+<script src="js/opentype.min.js"></script>
+<script src="js/snap.svg-min.js"></script>
+<script src="js/clipper.js"></script>
+
+<style>
+
+#loadfont {
+  position: relative;
+  overflow: hidden;
+  float: center;
+  margin-right: 4px;
+}
+#loadfont input {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 0;
+  opacity: 0;
+  filter: alpha(opacity=0);
+  transform: translate(-300px, 0) scale(4);
+  font-size: 23px;
+  direction: ltr;
+  cursor: pointer;
+}
+
+#PDF {
+   display:none;
+}
+
+</style>
+
+</head>
+
+<body onload="reload();">
+
+<div data-role="page" id="pagezero">
+  <div data-role="header">
+    
+    <h1>PRESS A KEY</h1>
+    <div data-role="navbar">
+      <ul>
+        <li><a href="#pageone">SETUP</a></li>
+        <li><a href="#pagezero" onclick="reload();" class="ui-btn-active ui-state-persist">STAMPMAKER</a></li>
+      </ul>
+    </div>
+  </div>
+  <div data-role="main" class="ui-content" id="container">
+    <canvas id="2D"> </canvas>
+  </div>
+  <div data-role="footer" style="text-align:center;">
+  <a href="#" class="ui-btn ui-corner-all ui-shadow ui-icon-eye ui-btn-icon-left" onclick="toggleFullScreen();">FULLSCREEN</a>
+<!--   cutout:
+   <input type="checkbox" data-role="flipswitch" name="cutout" id="cutout" onclick="cutOut();" checked/> -->
+    <span class="ui-btn ui-corner-all ui-shadow ui-icon-plus ui-btn-icon-left" id="loadfont" onclick="getFont();">
+       <span>LOAD FONT</span>
+       <input type="file" name="files[]" multiple data-role="none"/>
+    </span>
+    <a href="#" id="keybutton" class="ui-btn ui-corner-all ui-shadow ui-icon-edit ui-btn-icon-left">EDIT TEXT</a>
+    <a href="#" class="ui-btn ui-corner-all ui-shadow ui-icon-action ui-btn-icon-right" onclick="make();">SUBMIT JOB</a>
+  </div>
+</div> 
+
+<div data-role="page" id="pageone">
+  <div data-role="header">
+    <h1>SELECT A FONT</h1>
+    <div data-role="navbar">
+      <ul>
+        <li><a href="#pageone" class="ui-btn-active ui-state-persist">SETUP</a></li>
+        <li><a href="#pagezero" onclick="reload();">STAMPMAKER</a></li>
+      </ul>
+    </div>
+  </div>
+  <div data-role="main" class="ui-content">
+    <form method="post">
+      <fieldset class="ui-field-contain">
+        <label for="font">FONT</label>
+        <select name="font" id="font">
+          <option value="ChicagoFLF.ttf">Chicago</option>
+          <option value="junegull.ttf">Junegull</option>          
+          <option value="newmars.ttf">New Mars</option>
+          <option value="Roboto-Black.ttf" selected>Roboto</option>
+          <option value="square-deal.ttf">SquareDeal</option>
+          <option value="Ubuntu-Title.ttf">Ubuntu</option>
+        </select>
+      </fieldset>
+    </form>
+
+    <form method="post">
+      <fieldset class="ui-field-contain">
+
+         <label for="size">FONT SIZE</label>
+         <select name="size" id="size">
+
+          <option value="12">1/2"</option>
+          <option value="6">1"</option>
+          <option value="3" selected>2"</option>
+          <option value="2">3"</option>
+
+        </select>
+      </fieldset>
+    </form>
+
+    <form method="post">
+      <fieldset class="ui-field-contain">
+        <label for="material">ENGRAVE DEPTH</label>
+        <select name="thickness" id="thickness">
+          <option value="0.25">0.01"</option>
+          <option value="1.27" selected>0.05"</option>
+          <option value="2.54">0.1"</option>
+          <option value="6.35">0.25"</option>
+        </select>
+      </fieldset>
+    </form>
+
+    <form method="post">
+      <fieldset class="ui-field-contain">
+        <label for="material">MATERIAL TYPE</label>
+        <select name="material" id="material">
+          <option value="feed:5000,plunge:1500" selected>PLYWOOD</option>
+        </select>
+      </fieldset>
+    </form>
+
+    <form method="post">
+      <fieldset class="ui-field-contain">
+        <label for="material">MATERIAL THICKNESS</label>
+        <select name="mthickness" id="mthickness">
+          <option value="1.7">0.0625"</option>
+          <option value="3.25">0.125"</option>
+          <option value="6.5" selected>0.25"</option>
+          <option value="9.75" selected>0.375"</option>
+          <option value="13">0.5"</option>
+        </select>
+      </fieldset>
+    </form>
+
+
+    <form method="post">
+      <fieldset class="ui-field-contain">
+        <label for="day">CUTTING TOOL</label>
+        <select name="tool" id="tool">
+
+          <option value="0.0156">1/64" ENDMILL</option>
+          <option value="0.0313">1/32" ENDMILL</option>
+          <option value="0.0625">1/16" ENDMILL</option>
+          <option value="0.125" selected>1/8" ENDMILL</option>
+          <option value="0.25">1/4" ENDMILL</option>
+
+        </select>
+      </fieldset>
+    </form>
+</div>
+  <div data-role="footer" style="text-align:center;">
+    <a href="#" class="ui-btn ui-corner-all ui-shadow ui-icon-eye ui-btn-icon-left" onclick="toggleFullScreen();">FULLSCREEN</a>
+    <a href="#pagezero" onclick="reload();" class="ui-btn ui-corner-all ui-shadow ui-icon-carat-r ui-btn-icon-right">MAKE TEXT</a>
+  </div>
+</div> 
+
+
+<script type="application/processing" data-processing-target="2D">
+
+int verts = 100;
+int radius = 40;
+int sf2 = abs($(window).innerHeight()-275)/(ymax-ymin);
+int sf = 1;
+int x = 0;
+int y = 0;
+int sf;
+
+
+
+void setup(){
+   size($(window).innerWidth()-30,$(window).innerHeight()-180);
+   background(100);
+   noFill();
+   smooth();  
+   frameRate(1);
+   strokeCap(ROUND);
+   strokeWeight(1);
+   textFont(createFont("Arial",6));
+}
+
+void draw(){
+background(100);
+
+document.getElementById("2D").focus();
+
+//console.log(ymax-ymin);
+
+size($(window).innerWidth()-30,$(window).innerHeight()-180);
+
+
+stroke(255);
+fill(255);
+
+//ellipse(10,10,3,3);
+
+beginShape();
+for (i=51;i<=75;i++) {
+      vertex(20+Math.sin((Math.PI*2)/100*i)*20,20+Math.cos((Math.PI*2)/100*i)*20);   
+}
+vertex(0,0)
+endShape(CLOSE);
+
+
+beginShape();
+for (i=1;i<=25;i++) {
+      vertex(width-20+Math.sin((Math.PI*2)/100*i)*20,height-20+Math.cos((Math.PI*2)/100*i)*20);   
+}
+vertex(width,height)
+endShape(CLOSE);
+
+beginShape();
+for (i=76;i<=100;i++) {
+      vertex(20+Math.sin((Math.PI*2)/100*i)*20,height-20+Math.cos((Math.PI*2)/100*i)*20);   
+}
+vertex(0,height)
+endShape(CLOSE);
+
+
+beginShape();
+for (i=26;i<=50;i++) {
+
+   if((i>25)&&(i<=50)){
+      vertex(width-20+Math.sin((Math.PI*2)/100*i)*20,20+Math.cos((Math.PI*2)/100*i)*20);   
+   }
+}
+vertex($(window).innerWidth()-30,0)
+endShape(CLOSE);
+
+
+
+
+if((xmax*sf2)>($(window).innerWidth())){
+   sf = abs($(window).innerWidth())/(abs(xmax-xmin)+120);
+   scale(sf,sf);
+   textSize(12/sf);
+//   strokeWeight(2/sf);
+
+}
+else{
+   sf2 = abs($(window).innerHeight()-180)/(abs(ymax-ymin)+30+(cr*2)+(offset*2));
+   scale(sf2,sf2);
+//   strokeWeight(2/sf2);
+}
+
+
+//translate((-(xmin)+30),abs(ymin)+5);
+translate(30,abs(ymin)+5+cr+offset);
+
+//if(document.getElementById("cutout").checked==true){
+
+   noStroke();
+   fill(0,0,150);
+   beginShape();
+      for(i=0;i<cutout.length;i++){
+         vertex(xmax-cutout[i].X/100,cutout[i].Y/100);
+      }
+   endShape();
+
+//}
+
+strokeWeight(1/sf2);
+stroke(0,100,0,150);
+fill(0,100,0,150);
+
+
+//textSize(sf2*2);
+
+/*
+
+if(document.getElementById("cutout").checked==false){
+text(nf(((abs(ymin)+ymax)/document.getElementById("size").value/25.4),1,2) + "\" ", nf(xmin-27,1,0), nf(((ymin+ymax)/2),1,0));
+line(xmin-5,ymax,xmin-8,ymax);
+line(xmin-8,ymin,xmin-8,ymax);
+line(xmin-5,ymin,xmin-8,ymin);
+
+}
+else if(document.getElementById("cutout").checked==true){
+text(nf(((abs(ymin)+ymax+cr*2)/document.getElementById("size").value/25.4),1,2) + "\" ", nf(xmin-27,1,0), nf(((ymin+ymax)/2),1,0));
+line(xmin-5,ymax+cr+offset,xmin-8,ymax+cr+offset);
+line(xmin-8,ymin-cr-offset,xmin-8,ymax+cr+offset);
+line(xmin-5,ymin-cr-offset,xmin-8,ymin-cr-offset);
+
+}
+
+
+
+stroke(200,0,0,150);
+fill(180,0,0,150);
+
+if(document.getElementById("cutout").checked==false){
+line(xmin,ymax+8,xmin,ymax+5);
+line(xmin,ymax+8,xmax,ymax+8);
+line(xmax,ymax+8,xmax,ymax+5);
+text(nf(((xmax-xmin)/document.getElementById("size").value/25.4),1,2) + "\" ", nf(xmax/2-5,1,0), nf(ymax+16,1,0));
+}
+else if(document.getElementById("cutout").checked==true){
+line(xmin-cr-offset,ymax+8,xmin-cr-offset,ymax+5);
+line(xmin-cr-offset,ymax+8,xmax+cr+offset,ymax+8);
+line(xmax+cr+offset,ymax+8,xmax+cr+offset,ymax+5);
+text(nf(((xmax-xmin+cr*2)/document.getElementById("size").value/25.4),1,2) + "\" ", nf(xmax/2-5,1,0), nf(ymax+16,1,0));
+}
+
+*/
+
+noFill();
+
+strokeWeight(2/sf2);
+
+//console.log(xmax);
+
+for(i=0;i<dots.length;i++){
+   stroke(220,220,0);
+   beginShape();
+   for(j=0;j<dots[i].length;j++){
+           vertex(xmax-dots[i][j][0],dots[i][j][1]);      
+   }
+endShape();
+}
+
+
+stroke(255,200);
+
+for(i=0;i<pocket.length;i++){
+   for(j=0;j<pocket[i].length;j++){
+      beginShape();
+      for(j2=0;j2<pocket[i][j].length;j2++){   
+         vertex(nf(xmax-pocket[i][j][j2].X/100,0,1),nf(pocket[i][j][j2].Y/100,0,1));
+      }
+      endShape();
+      }
+
+}
+
+strokeWeight(1/sf2);
+stroke(0,0,0);
+fill(255,255,0);
+//if(document.getElementById("cutout").checked==true){
+//ellipse(xmin-(cr+offset),ymax+(cr+offset),2,2);
+//}
+//else{
+//ellipse(xmin,ymax,2,2);
+//}
+
+//fill(220,165,0,100);
+noFill();
+strokeWeight(1/sf2);
+//rect(xmin-3,ymax+3,xmax-xmin+6,ymin-6);
+
+
+}
+
+
+
+void keyPressed() {
+
+
+txt = String.fromCharCode(key);
+
+delta = []
+tabs = []
+pocket = []
+pockets = []
+cutout=[]
+setTimeout(loadtxt(), 100)
+
+}
+
+
+
+</script>
+
+<script>
+
+var g = ""
+var gcode = []                      
+var paths = []
+var shapes = []
+var fontFileName
+var points = []
+var count = []
+var svg = []
+var test = []
+var test2 = []
+var len = []
+var points = []
+var txt = "?"
+var xy = []
+var xy_offset = []
+var oset = [[0,1]]
+var dots = []
+var tool_diameter
+var pocket = []
+var pockets = []
+var pocket_o = []
+
+var curve = ""
+var curve_length
+var offsetted_paths = []
+
+var x = []
+var y = []
+var xmin
+var xmax
+var ymin
+var ymax
+var material
+var delta = []
+var tabs = [0,0]
+var ptabs = [0,0]
+var exfont = false
+var font
+var cutout = []
+var cr = 10
+var offset = 5
+var scale = 100
+
+function reload(){
+
+   points = []
+   count = []
+   shapes = []
+   test = []
+   test2 = []
+   points = []
+   path = ""
+   paths = []
+   xy = []
+   xy_offset = []
+   dots = []
+   svg = []
+   offsetted_paths = []
+   delta = []
+   tabs=[]
+   pocket = []
+   pockets = []
+   pocket_o = []
+   cutout = []
+
+   if(exfont==false){   
+      loadfont()
+      loadtxt()
+   }
+   else{
+      loadtxt()
+   }
+
+
+}
+
+
+$( "#keybutton" ).click(function() {
+
+
+   pocket = []
+   pockets = []
+   pocket_o = []
+
+   txt = window.prompt("ENTER TEXT TO ENGRAVE")
+   alert("this may take a few seconds...")
+
+   if(txt!=null){
+      reload()
+   }
+   else{
+      txt = "?"
+      reload()
+   }
+
+});
+
+
+$( "#radius" ).click(function() {
+
+
+   cutout = []
+
+
+   cr = window.prompt("ENTER OFFSET OF CUTOUT")
+   
+   cr = parseInt(cr)    
+//      console.log(cr)
+   if(cr!=null){
+      reload()
+   }
+   else{
+      cr = 0
+      reload()
+   }
+
+});
+
+
+function makeCutout(){
+
+for (i=0;i<=100;i++) {
+
+   if(i<=25){
+      cutout.push({X:(xmax+offset)+Math.sin((Math.PI*2)/scale*i)*cr,Y:ymax+offset+Math.cos((Math.PI*2)/scale*i)*cr});
+   }
+   else if((i>25)&&(i<=50)){
+      cutout.push({X:(xmax+offset)+Math.sin((Math.PI*2)/scale*i)*cr,Y:ymin-offset+Math.cos((Math.PI*2)/scale*i)*cr});
+   }
+   else if((i>50)&&(i<=75)){
+      cutout.push({X:xmin-offset+Math.sin((Math.PI*2)/scale*i)*cr,Y:ymin-offset+Math.cos((Math.PI*2)/scale*i)*cr});      
+   }
+   else if((i>75)&&(i<=100)){
+      cutout.push({X:xmin-offset+Math.sin((Math.PI*2)/scale*i)*cr,Y:ymax+offset+Math.cos((Math.PI*2)/scale*i)*cr});     
+      if(i==100){
+         cutout.push({X:(xmax+offset),Y:(ymax+offset+cr)});
+      }
+   }
+
+}
+//console.log(cutout);
+}
+
+function loadfont() {
+   fontFileName = 'fonts/' + document.getElementById("font").value
+}
+
+function loadtxt() {
+
+   if(exfont==false){
+//      onFontLoaded(font)      
+
+   opentype.load(fontFileName, function(err, font) 
+   {
+
+   if (err) {
+   alert('Font could not be loaded: ' + err)
+   } 
+      else {
+      onFontLoaded(font)
+      }
+   });
+
+   }
+   else{
+   onFontLoaded(font) 
+   }
+
+}
+
+function onFontLoaded(font) {
+
+
+//var path = font.getPath(txt, 0, 0, document.getElementById("size").value)
+var path = font.getPath(txt, 0, 0, 152.4)
+
+//console.log(path.commands);
+
+for(i=0;i<path.commands.length;i++){
+   if(path.commands[i].type=="M"){
+   count.push(i)
+   }
+}
+
+for(i=0;i<count.length;i++){
+
+   if(i==0){
+      paths.push([path.commands.slice(0,count[i+1])])
+   }
+   else if(i==count.length-1){
+      paths.push([path.commands.slice(count[i])])
+   }
+   else{
+      paths.push([path.commands.slice(count[i],count[i+1])])
+   }
+
+}
+
+for(i=0;i<paths.length;i++){
+   shapes.push(paths[i])
+}
+
+for(i=0;i<shapes.length;i++){
+test.push({commands: shapes[i][0], fill: "black", stroke: null, strokeWidth: 1})
+}
+
+test2 = []
+dots = []
+var lines
+
+for(i=0;i<test.length;i++){
+
+dots.push([]);
+
+    for(i2=0;i2<test[i].commands.length;i2++){
+  
+      test2 += test[i].commands[i2].type + " "
+   
+       if((test[i].commands[i2].type=="L") || (test[i].commands[i2].type=="M")){
+          test2 += test[i].commands[i2].x + " "
+          test2 += test[i].commands[i2].y + " "
+          dots[i].push([test[i].commands[i2].x,test[i].commands[i2].y])
+                
+       }  
+
+      if(test[i].commands[i2].type=="Q"){
+         test2 += test[i].commands[i2].x1 + " "
+         test2 += test[i].commands[i2].y1 + " "
+         test2 += test[i].commands[i2].x + " "
+         test2 += test[i].commands[i2].y + " "
+         
+         curve += "M ";
+         curve += test[i].commands[i2-1].x + " "
+         curve += test[i].commands[i2-1].y + " "
+
+         curve += test[i].commands[i2].type + " "
+         curve += test[i].commands[i2].x1 + " "
+         curve += test[i].commands[i2].y1 + " "
+         curve += test[i].commands[i2].x + " "
+         curve += test[i].commands[i2].y + " "
+
+//type==C
+
+         curve_length = parseFloat(Snap.path.getTotalLength(curve).toFixed(0))
+
+
+if(curve_length>1){
+         
+         for(j=1;j<curve_length;j=j+1){
+            dots[i].push([Snap.path.getPointAtLength(curve, j).x,Snap.path.getPointAtLength(curve, j).y])
+
+         }
+
+}
+
+            dots[i].push([test[i].commands[i2].x,test[i].commands[i2].y])
+
+         curve = ""
+         curve_length = 0                 
+      } 
+   }
+svg.push(test2)
+
+test2 = ""
+}
+
+var area = []
+var sum = 0
+var minx = []
+var miny = []
+var low = []
+
+xy = []
+x = []
+y = []
+
+
+for(i=0;i<dots.length;i++){
+
+points.push([]);
+
+   for(j=0;j<dots[i].length;j++){
+
+      points[i].push({X:dots[i][j][0],Y:dots[i][j][1]})
+      x.push(dots[i][j][0])
+      y.push(dots[i][j][1])
+
+   }
+
+}
+
+//console.log(dots);
+
+if(dots.length<1){
+
+   xmin = 0
+   xmax = 0
+   ymin = 0
+   ymax = 0
+}
+else{
+   xmin = (Math.min.apply(Math, x))
+   xmax = (Math.max.apply(Math, x))
+   ymin = (Math.min.apply(Math, y))
+   ymax = (Math.max.apply(Math, y))
+}
+
+
+tool_diameter= parseFloat((document.getElementById("tool").value * document.getElementById("size").value).toFixed(4))
+
+//console.log(document.getElementById("size").value);
+//console.log(tool_diameter);
+
+
+
+
+ClipperLib.JS.ScaleUpPaths(points, scale)
+
+
+
+var simple_paths = ClipperLib.Clipper.SimplifyPolygons(points, ClipperLib.PolyFillType.pftNonZero)
+
+makeCutout()
+for(i=0;i<cutout.length;i++){
+cutout[i].X=parseInt((cutout[i].X*scale).toFixed(0));
+cutout[i].Y=parseInt((cutout[i].Y*scale).toFixed(0));
+}
+//console.log(cutout);
+simple_paths.push(cutout);
+
+var co = new ClipperLib.ClipperOffset((tool_diameter/2*25.4), 0.25)
+co.AddPaths(simple_paths, ClipperLib.JoinType.jtMiter, ClipperLib.EndType.etClosedPolygon)
+
+
+i=1
+j2 = 1
+
+while(i>0){
+   
+   offsetted_paths = new ClipperLib.Paths()
+//   co.Execute(offsetted_paths,-((tool_diameter/2*25.4)*i) * scale)
+//   document.getElementById("size").value
+
+if(i==1){
+   co.Execute(offsetted_paths,-(tool_diameter/2*25.4) * scale)
+//   console.log(i)
+}
+else{
+
+   co.Execute(offsetted_paths,-((tool_diameter/2*25.4)*j2) * scale)
+//   co.Execute(offsetted_paths,-(((tool_diameter/2*25.4)*2)+((tool_diameter/2*25.4)*i*0.8) * scale))
+//   console.log(j2)
+}
+
+   j2+=0.7
+
+   pocket.push(offsetted_paths)
+//   console.log(i);
+   i++
+   
+
+   if(pocket[i-2].length==0){
+   i=0;
+   pocket.splice(pocket.length,0)
+
+   }
+
+}
+
+
+pocket_o = [];
+
+for(i=0;i<pocket.length;i++){
+
+   for(j=0;j<pocket[i].length;j++){
+      pocket[i][j].push(pocket[i][j][0])
+
+   }
+
+}
+
+pocket_o = pocket[0]
+pocket.splice(0,1)
+
+var pt
+var inpg
+
+for(i=0;i<pocket_o.length;i++){
+
+pt = new ClipperLib.IntPoint(pocket_o[i][0].X,pocket_o[i][0].Y)
+
+
+//create outer pocket profile
+
+for(j=0;j<pocket_o.length;j++){
+
+   //0 = false
+   //-1 = on
+   //1 = in
+   inpg = ClipperLib.Clipper.PointInPolygon(pt, pocket_o[j])
+
+   if(inpg==1){
+   //console.log("pg: " + i + " is in pg: " + j);
+      pocket[0].push(pocket_o[i])
+      pocket_o.splice(i,1)
+      i = i-1
+   }
+
+}
+}
+
+
+for(i=0;i<pocket_o.length;i++){
+
+pockets.push([])
+
+for(j=0;j<pocket.length;j++){
+
+   for(j2=0;j2<pocket[j].length;j2++){
+
+   pt = new ClipperLib.IntPoint(pocket[j][j2][0].X,pocket[j][j2][0].Y)
+   inpg = ClipperLib.Clipper.PointInPolygon(pt, pocket_o[i])
+
+   if(inpg==1){
+      pockets[i].push(pocket[j][j2])
+   }
+   }
+}
+}
+
+pocket = []
+
+
+
+for(i=0;i<pockets.length;i++){
+
+   pocket.push([])
+
+   j=0;
+
+      while(j<pockets[i].length){
+
+         pt = new ClipperLib.IntPoint(pockets[i][j][0].X,pockets[i][j][0].Y)
+         inpg = 0;      
+         for(j2=0;j2<pockets[i].length;j2++){
+           inpg += ClipperLib.Clipper.PointInPolygon(pt, pockets[i][j2])                 
+         }
+
+         if(inpg==-1){
+
+            pocket[i].push(pockets[i][j])
+            pockets[i].splice(j,1)
+            j--
+      }
+   j++;
+   }
+}
+
+var check = 1
+
+while(check>0){
+
+
+for(i=0;i<pockets.length;i++){
+
+   if(pockets[i].length>0){
+
+   j=0;
+   while(j<pockets[i].length){
+
+      pt = new ClipperLib.IntPoint(pockets[i][j][0].X,pockets[i][j][0].Y)
+      inpg = 0;
+
+      for(j2=0;j2<pockets[i].length;j2++){
+         inpg += ClipperLib.Clipper.PointInPolygon(pt, pockets[i][j2])                  
+      }
+
+      if(inpg==-1){
+
+         pocket[i].splice(-1,0,pockets[i][j])
+         pockets[i].splice(j,1)
+         j--
+
+        
+      }
+   j++
+   }
+   }
+
+}
+
+//check
+
+check = 0;
+
+for(i=0;i<pockets.length;i++){
+   if(pockets[i].length>0){
+      check = 1
+   }
+
+
+}
+
+}
+
+//console.log(pockets)
+//console.log(check)
+//console.log(pocket_o)
+//console.log(pocket);
+pocket_o = pocket_o.reverse()
+
+for(i=0;i<pocket.length;i++){
+   pocket[i].splice(0,0,pocket_o[i]);
+}
+
+for(i=0;i<pocket.length;i++){
+   pocket[i].reverse()
+}
+
+pocket_o = pocket_o[0]
+
+var l2r = [];
+//order array from left to right
+//console.log(pocket)
+
+for(i=0;i<pocket.length;i++){
+   //console.log(pocket[i][0][0].X + " " + i);
+   l2r.push({index:i, x:pocket[i][0][0].X});
+}
+
+//console.log(l2r);
+
+l2r.sort(function(a, b) {
+    return parseFloat(a.x) - parseFloat(b.x);
+});
+
+pockets=[];
+//console.log(l2r)
+for(i=0;i<l2r.length;i++){
+
+pockets.push(pocket[l2r[i].index]);
+
+}
+
+//console.log(pocket_o)
+pocket = pockets
+
+pocket = pocket.reverse();
+//console.log(pocket)
+
+xy_offset = []
+points = []
+count = []
+shapes = []
+test = []
+test2 = []
+path = " "
+paths = []
+shape = []
+len = []
+svg = []
+
+//console.log(document.getElementById("thickness").value);
+
+material = eval('({' + (document.getElementById("material").value) + '})');
+
+//console.log(material.feed);
+//console.log(material.plunge);
+
+}
+
+
+function showPDF(){
+
+$( "#PDF" ).toggle();
+$( "#2D" ).toggle();
+
+}
+
+
+function make(){
+
+var pass = 1
+var pass_no = (document.getElementById("thickness").value/(document.getElementById("tool").value*25.4)).toFixed(0)
+if(pass_no==0){
+   pass_no=1
+}
+
+var pass_depth = document.getElementById("thickness").value/pass_no
+
+
+g=""
+
+//header
+g+="g21\n"
+g+="g0z5\n"
+g+="m4\n"
+g+="g4p2\n"
+g+="g0z5\n"
+
+for(i=0;i<pocket.length;i++){
+
+   while(pass<=pass_no){
+
+   for(j=0;j<pocket[i].length;j++){
+      for(j2=0;j2<pocket[i][j].length;j2++){
+            if(j2==0){
+               g+= "g0x" + (xmax/document.getElementById("size").value-(pocket[i][j][j2].X/100)/document.getElementById("size").value).toFixed(2) + "y" + ((ymax-(pocket[i][j][j2].Y/100)/document.getElementById("size").value).toFixed(2)) + "\n"
+               g+="g1z-" + (pass_depth*pass) + "f" + material.plunge + "\n"
+            }
+            else{              
+               g+= "g1x" + (xmax/document.getElementById("size").value-(pocket[i][j][j2].X/100)/document.getElementById("size").value).toFixed(2) + "y" + (((ymax/document.getElementById("size").value)-(pocket[i][j][j2].Y/100)/document.getElementById("size").value).toFixed(2)) + "f" + material.feed + "\n"
+            }
+       }
+       g+="g0z1\n"     
+      }
+   pass++
+   }
+   pass=1
+   g+="g0z2\n" 
+}
+
+
+pass = 1
+pass_no = (document.getElementById("mthickness").value/(document.getElementById("tool").value*25.4)).toFixed(0)
+if(pass_no==0){
+   pass_no=1
+}
+
+
+pass_depth = document.getElementById("mthickness").value/pass_no
+
+console.log(pass_no)
+console.log(pass_depth)
+
+while(pass<=pass_no){
+     
+      for(i=0;i<pocket_o.length;i++){
+      
+         
+      
+      	g+="g1z-" + (pass_depth*pass) + "f" + material.plunge + "\n"
+      	
+         g+= "g1x" + ((xmax/document.getElementById("size").value-pocket_o[i].X/100/document.getElementById("size").value)).toFixed(2) + "y" + ((ymax/document.getElementById("size").value-pocket_o[i].Y/100/document.getElementById("size").value)).toFixed(2) + "f" + material.feed + "\n";
+      
+      
+      }
+      pass++
+      }
+
+
+g+="g0z5\n"
+g+="m5\n"
+g+="m30\n"
+
+//console.log(g)
+//console.log(pass_no)
+//console.log(pass_depth)
+//alert(((((xmax-xmin)/document.getElementById("size").value)+offset*2)/25.4).toFixed(2) + "\" x " + ((((ymax-ymin)/document.getElementById("size").value)+offset*2)/25.4).toFixed(2) + "\"")
+
+fabmo.submitJob({
+   file : g,
+   filename : txt + '.g',
+   name : "STAMP: " + txt + " " + ((((xmax-xmin)/document.getElementById("size").value)+offset*2)/25.4).toFixed(2) + " x " + ((((ymax-ymin)/document.getElementById("size").value)+offset*2)/25.4).toFixed(2) + "\"",
+   description : "FONT: " + document.getElementById("font").value 
+});
+
+
+g=""
+
+}
+
+
+function getFont(){
+
+alert("Select a TTF File")
+
+}
+
+function onReadFile(evt) {
+
+   exfont = true
+   pocket = []
+   pockets = []
+   cutout = [];
+
+   
+    var f = evt.target.files[0]; 
+
+    if (f) {
+
+      var r = new FileReader();
+      r.onload = function(e) { 
+	     var contents = e.target.result;
+        
+        font = opentype.parse(e.target.result);
+        onFontLoaded(font);
+        
+      }
+        r.readAsArrayBuffer(f);
+
+    } else { 
+      alert("Failed to load file");
+    }
+
+}
+
+
+
+document.getElementById('font').addEventListener('click', function(){
+    exfont = false
+});
+
+
+
+document.getElementById('loadfont').addEventListener('change', onReadFile, false);
+
+// toggle full screen
+function toggleFullScreen() {
+  if (!document.fullscreenElement &&    // alternative standard method
+      !document.mozFullScreenElement && !document.webkitFullscreenElement) {  // current working methods
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen();
+    } else if (document.documentElement.mozRequestFullScreen) {
+      document.documentElement.mozRequestFullScreen();
+    } else if (document.documentElement.webkitRequestFullscreen) {
+      document.documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+    }
+  } else {
+    if (document.cancelFullScreen) {
+      document.cancelFullScreen();
+    } else if (document.mozCancelFullScreen) {
+      document.mozCancelFullScreen();
+    } else if (document.webkitCancelFullScreen) {
+      document.webkitCancelFullScreen();
+    }
+  }
+}
+
+</script>
+
+
+</body>
+</html>
+
