@@ -6,12 +6,7 @@
 
 
 <script src="js/jquery-1.11.2.min.js"></script>
-<script src="js/libs/fabmo.js"></script>
-    <script type="text/javascript">
-        var fabmo = new FabMoDashboard();
-    </script>
-<script src="js/control.js"></script>
-<script src="js/config.js"></script>
+<script src="js/libs/fabmo.min.js"></script>
 <script src="js/jquery.mobile-1.4.5.js"></script>
 <script src="js/processing.min.js"></script>
 <script src="js/opentype.min.js"></script>
@@ -52,7 +47,7 @@
 <div data-role="page" id="pagezero">
   <div data-role="header">
     
-    <h1>PRESS A KEY</h1>
+    <h1>PRESS A KEY OR ENTER TEXT IN SETUP</h1>
     <div data-role="navbar">
       <ul>
         <li><a href="#pageone">SETUP</a></li>
@@ -64,14 +59,10 @@
     <canvas id="2D"> </canvas>
   </div>
   <div data-role="footer" style="text-align:center;">
-  <a href="#" class="ui-btn ui-corner-all ui-shadow ui-icon-eye ui-btn-icon-left" onclick="toggleFullScreen();">FULLSCREEN</a>
-<!--   cutout:
-   <input type="checkbox" data-role="flipswitch" name="cutout" id="cutout" onclick="cutOut();" checked/> -->
     <span class="ui-btn ui-corner-all ui-shadow ui-icon-plus ui-btn-icon-left" id="loadfont" onclick="getFont();">
        <span>LOAD FONT</span>
        <input type="file" name="files[]" multiple data-role="none"/>
     </span>
-    <a href="#" id="keybutton" class="ui-btn ui-corner-all ui-shadow ui-icon-edit ui-btn-icon-left">EDIT TEXT</a>
     <a href="#" class="ui-btn ui-corner-all ui-shadow ui-icon-action ui-btn-icon-right" onclick="make();">SUBMIT JOB</a>
   </div>
 </div> 
@@ -87,6 +78,15 @@
     </div>
   </div>
   <div data-role="main" class="ui-content">
+
+    <form method="post">
+      <fieldset class="ui-field-contain">
+        <label for="textInput">TEXT</label>
+			<input type='text' id="txt" value="stamp"/>
+      </fieldset>
+    </form>
+
+
     <form method="post">
       <fieldset class="ui-field-contain">
         <label for="font">FONT</label>
@@ -166,7 +166,6 @@
     </form>
 </div>
   <div data-role="footer" style="text-align:center;">
-    <a href="#" class="ui-btn ui-corner-all ui-shadow ui-icon-eye ui-btn-icon-left" onclick="toggleFullScreen();">FULLSCREEN</a>
     <a href="#pagezero" onclick="reload();" class="ui-btn ui-corner-all ui-shadow ui-icon-carat-r ui-btn-icon-right">MAKE TEXT</a>
   </div>
 </div> 
@@ -282,42 +281,7 @@ fill(0,100,0,150);
 
 //textSize(sf2*2);
 
-/*
 
-if(document.getElementById("cutout").checked==false){
-text(nf(((abs(ymin)+ymax)/document.getElementById("size").value/25.4),1,2) + "\" ", nf(xmin-27,1,0), nf(((ymin+ymax)/2),1,0));
-line(xmin-5,ymax,xmin-8,ymax);
-line(xmin-8,ymin,xmin-8,ymax);
-line(xmin-5,ymin,xmin-8,ymin);
-
-}
-else if(document.getElementById("cutout").checked==true){
-text(nf(((abs(ymin)+ymax+cr*2)/document.getElementById("size").value/25.4),1,2) + "\" ", nf(xmin-27,1,0), nf(((ymin+ymax)/2),1,0));
-line(xmin-5,ymax+cr+offset,xmin-8,ymax+cr+offset);
-line(xmin-8,ymin-cr-offset,xmin-8,ymax+cr+offset);
-line(xmin-5,ymin-cr-offset,xmin-8,ymin-cr-offset);
-
-}
-
-
-
-stroke(200,0,0,150);
-fill(180,0,0,150);
-
-if(document.getElementById("cutout").checked==false){
-line(xmin,ymax+8,xmin,ymax+5);
-line(xmin,ymax+8,xmax,ymax+8);
-line(xmax,ymax+8,xmax,ymax+5);
-text(nf(((xmax-xmin)/document.getElementById("size").value/25.4),1,2) + "\" ", nf(xmax/2-5,1,0), nf(ymax+16,1,0));
-}
-else if(document.getElementById("cutout").checked==true){
-line(xmin-cr-offset,ymax+8,xmin-cr-offset,ymax+5);
-line(xmin-cr-offset,ymax+8,xmax+cr+offset,ymax+8);
-line(xmax+cr+offset,ymax+8,xmax+cr+offset,ymax+5);
-text(nf(((xmax-xmin+cr*2)/document.getElementById("size").value/25.4),1,2) + "\" ", nf(xmax/2-5,1,0), nf(ymax+16,1,0));
-}
-
-*/
 
 noFill();
 
@@ -373,6 +337,8 @@ void keyPressed() {
 
 txt = String.fromCharCode(key);
 
+document.getElementById('txt').value=txt;
+
 delta = []
 tabs = []
 pocket = []
@@ -388,7 +354,9 @@ setTimeout(loadtxt(), 100)
 
 <script>
 
-var g = ""
+var fabmo = new FabMoDashboard();
+
+var g
 var gcode = []                      
 var paths = []
 var shapes = []
@@ -400,7 +368,7 @@ var test = []
 var test2 = []
 var len = []
 var points = []
-var txt = "?"
+var txt
 var xy = []
 var xy_offset = []
 var oset = [[0,1]]
@@ -410,7 +378,7 @@ var pocket = []
 var pockets = []
 var pocket_o = []
 
-var curve = ""
+var curve
 var curve_length
 var offsetted_paths = []
 
@@ -452,6 +420,8 @@ function reload(){
    pockets = []
    pocket_o = []
    cutout = []
+
+	txt = document.getElementById('txt').value
 
    if(exfont==false){   
       loadfont()

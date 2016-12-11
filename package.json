@@ -1,10 +1,17 @@
+
 {
 	"name":"StampMaker",
+	"repository":"https://github.com/FabMo/fabmo-stampmaker-app.git",
+	"license":"MIT",
 	"main":"./index.html",
 	"icon":"icon.png",
-	"icon_color":"white",
-	"version":"0.0.2",
+	"icon_color":"#fff",
+	"version":"1.0.0",
 	"author":"Jonathan Ward",
-	"website":"http://github.com/FabMo/",
-	"description":"StampMaker"
+	"website":"http://gofabmo.org/fabmo-stampmaker-app",
+	"description":"make stamps",
+	"devDependencies": {
+    	"grunt": "^0.4.5",
+    	"grunt-zip": "^0.17.1"
+  	}
 }
